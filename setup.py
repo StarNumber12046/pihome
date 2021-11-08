@@ -1,14 +1,17 @@
 import os, platform
 from setuptools import setup
 if platform.system().lower() == "windows":
-
+req = """
+flask 
+pychromecast 
+"""
 
   os.system("pip install -r requirements.txt")
 else:
   os.system("pip3 install -r requirements.txt")
 requirements = []
-with open('requirements.txt') as f:
-  requirements = f.read().splitlines()
+
+requirements = req.read().splitlines()
 setup(name="pihome", version="1.0.0", packages=["."], license="MIT", install_requires=requirements, classifiers=['Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
         'Intended Audience :: All',
