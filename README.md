@@ -9,7 +9,7 @@ Play local music to your google home
 ```
 git clone https://github.com/StarNumber12046/pihome
 cd pihome
-cd server
+cd pihome (that's not duplicated, that MUST be done)
 pip3 install flask
 pip3 install pychromecast
 python3 server.py

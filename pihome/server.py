@@ -2,11 +2,18 @@ from flask import *
 import pychromecast
 import os
 import socket
+import json
 print(socket.gethostbyname(socket.gethostname()))
 
 app = Flask("pihome")
+f = open("config.json", "r")
 
-env = {"src_path":"C:/Users/franc/Desktop/music", "host": "0.0.0.0", "port": "8080"}
+env = json.load(f)
+print(env)
+f.close()
+
+if env["ip_override"] == "None":
+  env["ip_override"] = socket.gethostbyname(socket.gethostname())
 try:
   services, browser = pychromecast.discovery.discover_chromecasts()
   print(services)
@@ -28,12 +35,12 @@ def get_index(list, name):
 
 @app.route("/list")
 def list():
-  return {"list": os.listdir(env["src_path"])}
+  return {"list": sorted(os.listdir(env["src_path"]))}
 
 @app.route("/")
 def index():
 
-  return render_template("index.html", np=mc.status.content_id, len = len(os.listdir(env["src_path"])), music = os.listdir(env["src_path"]))
+  return render_template("index.html", np=mc.status.content_id, len = len(os.listdir(env["src_path"])), music = sorted(os.listdir(env["src_path"])))
 
 @app.route("/music/<track>")
 def music(track):
@@ -95,10 +102,7 @@ def play_from_path():
 
 @app.route("/cast/<song>")
 def cast(song):
-  if env["host"] == "0.0.0.0":
-    host = socket.gethostbyname(socket.gethostname())
-  else:
-    host=env["host"]
+  host = env["ip_override"]
 
   play=f'http://{host}:{env["port"]}/music/{song}'
   print(play)
@@ -108,7 +112,7 @@ def cast(song):
 @app.route("/play_path", methods=['POST', 'GET'])
 def play_path():
   path = request.form["path"]
-  mc.play_media(f"http://{socket.gethostbyname(socket.gethostname())}:{env['port']}/play_from_path?path={path}", 'audio/mp3')
+  mc.play_media(f"http://{env['ip_override']}:{env['port']}/play_from_path?path={path}", 'audio/mp3')
   return redirect("/")
 
 app.run(host=env["host"], port=env["port"])
