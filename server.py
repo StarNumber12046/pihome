@@ -7,14 +7,17 @@ print(socket.gethostbyname(socket.gethostname()))
 app = Flask("pihome")
 
 env = {"src_path":"C:/Users/franc/Desktop/music", "host": "0.0.0.0", "port": "8080"}
-services, browser = pychromecast.discovery.discover_chromecasts()
-print(services)
-print(browser)
-chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["GHome"])
+try:
+  services, browser = pychromecast.discovery.discover_chromecasts()
+  print(services)
+  print(browser)
+  chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["GHome"])
 
-cast = chromecasts[0]
-cast.wait()
-mc = cast.media_controller
+  cast = chromecasts[0]
+  cast.wait()
+  mc = cast.media_controller
+except:
+  exit("No chromecast found")
 
 def get_index(list, name):
   for a in range(len(list)):
