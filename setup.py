@@ -11,7 +11,7 @@ else:
   os.system("pip3 install -r requirements.txt")
 requirements = []
 
-requirements = req.read().splitlines()
+requirements = req.splitlines()
 setup(name="pihome", version="1.0.0", packages=["."], license="MIT", install_requires=requirements, classifiers=['Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
         'Intended Audience :: All',
