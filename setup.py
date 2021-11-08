@@ -9,7 +9,7 @@ else:
 requirements = []
 with open('requirements.txt') as f:
   requirements = f.read().splitlines()
-setup(name="pihome", version="1.0.0", packages=["pihome"], license="MIT", install_requires=requirements, classifiers=['Development Status :: 5 - Production/Stable',
+setup(name="pihome", version="1.0.0", packages=["."], license="MIT", install_requires=requirements, classifiers=['Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
         'Intended Audience :: All',
         'Natural Language :: English',
