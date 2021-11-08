@@ -19,3 +19,7 @@ Now open `localhost:8080` on your browser
 # What doesn't work?
 - Next and previous (in dashboard) does not work throught local files
 - Loop (in dashboard) does not work throught local files
+- gitignore
+
+# Issue tracking
+Feel free to open an **issue** in this repo
