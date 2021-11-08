@@ -3,7 +3,14 @@ import pychromecast
 import os
 import socket
 import json
+import updater
+import dotenv
+
 print(socket.gethostbyname(socket.gethostname()))
+
+
+if updater.has_updates():
+  updater.update()
 
 app = Flask("pihome")
 f = open("config.json", "r")
