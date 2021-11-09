@@ -121,7 +121,22 @@ def next():
 
 @app.route("/prev")
 def prev():
-  mc.previous_track()
+  if mc.status.content_id is None:
+    mc.play_media(env["src_path"] + "/" +
+                  os.listdir(env["src_path"])[0], "audio/mp3")
+  if not mc.status.content_id.startswith("http"):
+
+    mc.next_track()
+  else:
+    try:
+      song = mc.status.content_id[32:]
+      list = os.listdir(env["src_path"])
+      print(get_index(list, song))
+      mc.play_media(
+          f'http://{env["ip_override"]}:{env["port"]}/music/{list[get_index(list, song)-1]}', "audio/mp3")
+    except:
+      mc.play_media(f'http://{env["ip_override"]}:{env["port"]}' +
+                    os.listdir(env["src_path"])[0], "audio/mp3")
   return redirect("/")
 
 
