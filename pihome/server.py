@@ -11,6 +11,14 @@ print(socket.gethostbyname(socket.gethostname()))
 
 colorama.init()
 
+if not "config.json" in os.listdir("."):
+  print("Config file not found. Creating one...")
+  with open("config.pihome", "r") as f:
+    default_conf = f.read()
+    f.close
+  with open("config.json", "w") as f:
+    f.write(default_conf)
+    f.close()
 
 if updater.has_updates():
   print(colorama.Fore.RED + "Updates available!" + colorama.Style.RESET_ALL)
