@@ -39,8 +39,7 @@ if updater.has_updates():
     updater.update()
   elif ch1.lower() == "c":
     print("Update cancelled")
-  
-  
+
 
 app = Flask("pihome")
 f = open("config.json", "r")
@@ -55,7 +54,8 @@ try:
   services, browser = pychromecast.discovery.discover_chromecasts()
   print(services)
   print(browser)
-  chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=["GHome"])
+  chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=[
+                                                             "GHome"])
 
   cast = chromecasts[0]
   cast.wait()
@@ -63,77 +63,91 @@ try:
 except:
   exit("No chromecast found")
 
+
 def get_index(list, name):
   for a in range(len(list)):
     if list[a] == name:
       return a
 
 
-
 @app.route("/list")
 def list():
   return {"list": sorted(os.listdir(env["src_path"]))}
 
+
 @app.route("/")
 def index():
 
-  return render_template("index.html", np=mc.status.content_id, len = len(os.listdir(env["src_path"])), music = sorted(os.listdir(env["src_path"])))
+  return render_template("index.html", np=mc.status.content_id, len=len(os.listdir(env["src_path"])), music=sorted(os.listdir(env["src_path"])))
+
 
 @app.route("/music/<track>")
 def music(track):
   return send_file(env["src_path"] + "/" + track)
+
 
 @app.route("/pause")
 def pause():
   mc.pause()
   return redirect("/")
 
+
 @app.route("/play")
 def play():
   mc.play()
   return redirect("/")
 
+
 @app.route("/next")
 def next():
   if mc.status.content_id is None:
-    mc.play_media(env["src_path"] + "/" + os.listdir(env["src_path"])[0], "audio/mp3")
+    mc.play_media(env["src_path"] + "/" +
+                  os.listdir(env["src_path"])[0], "audio/mp3")
   if not mc.status.content_id.startswith("http"):
-    
+
     mc.next_track()
   else:
     try:
       song = mc.status.content_id[32:]
       list = os.listdir(env["src_path"])
       print(get_index(list, song))
-      mc.play_media(env["src_path"] + "/" + list[get_index(list, song)+1], "audio/mp3")
+      mc.play_media(
+          f'http://{env["ip_override"]}:{env["port"]}/music/{list[get_index(list, song)+1]}', "audio/mp3")
     except:
-      mc.play_media(env["src_path"] + "/" + os.listdir(env["src_path"])[0], "audio/mp3")
+      mc.play_media(f'http://{env["ip_override"]}:{env["port"]}' +
+                    os.listdir(env["src_path"])[0], "audio/mp3")
   return redirect("/")
+
 
 @app.route("/prev")
 def prev():
   mc.previous_track()
   return redirect("/")
 
+
 @app.route("/stop")
 def stop():
   mc.stop()
   return redirect("/")
+
 
 @app.route("/volume/<vol>")
 def volume(vol):
   mc.volume = int(vol)
   return redirect("/")
 
+
 @app.route("/volume-up")
 def volumeupp():
   cast.set_volume(cast.status.volume_level + 0.1)
   return redirect("/")
 
+
 @app.route("/volume-down")
 def volumedown():
   cast.set_volume(cast.status.volume_level - 0.1)
   return redirect("/")
+
 
 @app.route("/loop")
 def loop():
@@ -144,24 +158,29 @@ def loop():
     mc.repeat = False
   return redirect("/")
 
+
 @app.route("/play_from_path/")
 def play_from_path():
   path = request.args.get("path")
   return send_file(path)
 
+
 @app.route("/cast/<song>")
 def start_song(song):
   host = env["ip_override"]
 
-  play=f'http://{host}:{env["port"]}/music/{song}'
+  play = f'http://{host}:{env["port"]}/music/{song}'
   print(play)
   mc.play_media(play, 'audio/mp3')
   return redirect("/")
 
+
 @app.route("/play_path", methods=['POST', 'GET'])
 def play_path():
   path = request.form["path"]
-  mc.play_media(f"http://{env['ip_override']}:{env['port']}/play_from_path?path={path}", 'audio/mp3')
+  mc.play_media(
+      f"http://{env['ip_override']}:{env['port']}/play_from_path?path={path}", 'audio/mp3')
   return redirect("/")
+
 
 app.run(host=env["host"], port=env["port"])
