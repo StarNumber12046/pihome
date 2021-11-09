@@ -5,12 +5,34 @@ import socket
 import json
 import updater
 import dotenv
-
+import colorama
+from colorama import Fore, Back, Style
 print(socket.gethostbyname(socket.gethostname()))
+
+colorama.init()
 
 
 if updater.has_updates():
-  updater.update()
+  print(colorama.Fore.RED + "Updates available!" + colorama.Style.RESET_ALL)
+  print("Press W+Enter to see the changelog, U+Enter to update and C+Enter to cancel")
+  ch1 = input("> ")
+  if ch1.lower() == "w":
+    print(updater.get_changelog())
+    ch = input("Do you want to update? (y/n)\n[y]> ")
+    if ch.lower() == "y":
+      updater.update()
+      print("Update successful")
+    elif ch.lower() == "n":
+      print("Update cancelled")
+    else:
+      updater.update()
+      print("Update succesfull")
+  if ch1.lower() == "u":
+    updater.update()
+  elif ch1.lower() == "c":
+    print("Update cancelled")
+  
+  
 
 app = Flask("pihome")
 f = open("config.json", "r")
@@ -65,7 +87,19 @@ def play():
 
 @app.route("/next")
 def next():
-  mc.next_track()
+  if mc.status.content_id is None:
+    mc.play_media(env["src_path"] + "/" + os.listdir(env["src_path"])[0], "audio/mp3")
+  if not mc.status.content_id.startswith("http"):
+    
+    mc.next_track()
+  else:
+    try:
+      song = mc.status.content_id[32:]
+      list = os.listdir(env["src_path"])
+      print(get_index(list, song))
+      mc.play_media(env["src_path"] + "/" + list[get_index(list, song)+1], "audio/mp3")
+    except:
+      mc.play_media(env["src_path"] + "/" + os.listdir(env["src_path"])[0], "audio/mp3")
   return redirect("/")
 
 @app.route("/prev")
@@ -85,12 +119,12 @@ def volume(vol):
 
 @app.route("/volume-up")
 def volumeupp():
-  mc.volume_level += 1
+  cast.set_volume(cast.status.volume_level + 0.1)
   return redirect("/")
 
 @app.route("/volume-down")
 def volumedown():
-  mc.volume_level -= 1
+  cast.set_volume(cast.status.volume_level - 0.1)
   return redirect("/")
 
 @app.route("/loop")
@@ -108,7 +142,7 @@ def play_from_path():
   return send_file(path)
 
 @app.route("/cast/<song>")
-def cast(song):
+def start_song(song):
   host = env["ip_override"]
 
   play=f'http://{host}:{env["port"]}/music/{song}'
