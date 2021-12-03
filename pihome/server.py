@@ -7,6 +7,7 @@ import updater
 import dotenv
 import colorama
 from colorama import Fore, Back, Style
+from ID3 import *
 print(socket.gethostbyname(socket.gethostname()))
 
 colorama.init()
@@ -69,16 +70,18 @@ def get_index(list, name):
     if list[a] == name:
       return a
 
-
+for a in os.listdir(env["src_path"]):
+  id3info = ID3(f"{env['src_path']}/{a}")
+  list.append(id3info['TITLE'])
 @app.route("/list")
 def list():
-  return {"list": sorted(os.listdir(env["src_path"]))}
+  return {"list": sorted(list)}
 
 
 @app.route("/")
 def index():
 
-  return render_template("index.html", np=mc.status.content_id, len=len(os.listdir(env["src_path"])), music=sorted(os.listdir(env["src_path"])))
+  return render_template("index.html", np=mc.status.content_id, len=len(os.listdir(env["src_path"])), music=sorted(list))
 
 
 @app.route("/music/<track>")
