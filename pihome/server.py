@@ -8,6 +8,8 @@ import dotenv
 import colorama
 from colorama import Fore, Back, Style
 from ID3 import *
+
+print("IP :", sep=" ")
 print(socket.gethostbyname(socket.gethostname()))
 
 colorama.init()
